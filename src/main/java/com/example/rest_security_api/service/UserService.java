@@ -3,6 +3,7 @@ package com.example.rest_security_api.service;
 import com.example.rest_security_api.dto.UserCreateDto;
 import com.example.rest_security_api.dto.UserReadDto;
 import com.example.rest_security_api.entity.User;
+import com.example.rest_security_api.mapper.UserReadMapper;
 import com.example.rest_security_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,17 +21,17 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private UserReadMapper userReadMapper;
+
+
 
 
     public List<UserReadDto> findAll() {
-        return null;
-//        userRepository.; //ЧЗХ
+        return userRepository.findAll().stream().map(userReadMapper::map).toList();
     }
 
     public Optional<UserReadDto> getById(Integer id) {
-        userRepository.getReferenceById(id);
-        return null;
+        return userRepository.findById(id).map(userReadMapper::map);
     }
 
     public UserReadDto create(UserReadDto user) {

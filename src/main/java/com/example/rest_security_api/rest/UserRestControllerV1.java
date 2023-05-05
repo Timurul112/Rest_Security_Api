@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class UserRestControllerV1 {
 
 
     @GetMapping
-    public UserReadDto findAll() {
+    public List<UserReadDto> findAll() {
         return userService.findAll();
     }
 
