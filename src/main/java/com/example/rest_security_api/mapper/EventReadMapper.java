@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EventReadMapper implements Mapper<Event, EventReadDto> {
 
-    private final EventReadMapper eventReadMapper;
-
 
     @Override
     public EventReadDto map(Event entity) {

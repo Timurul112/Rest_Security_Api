@@ -1,8 +1,9 @@
 package com.example.rest_security_api.rest;
 
 
-import com.example.rest_security_api.dto.UserCreateDto;
+import com.example.rest_security_api.dto.UserCreateEditDto;
 import com.example.rest_security_api.dto.UserReadDto;
+import com.example.rest_security_api.mapper.UserCreateEditMapper;
 import com.example.rest_security_api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,12 +33,12 @@ public class UserRestControllerV1 {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserReadDto create(@RequestBody UserReadDto user) {
+    public UserReadDto create(@RequestBody UserCreateEditDto user) {
         return userService.create(user);
     }
 
     @PutMapping("/{id}")
-    public UserReadDto update(@PathVariable Integer id, @RequestBody UserCreateDto user) {
+    public UserReadDto update(@PathVariable Integer id, @RequestBody UserCreateEditDto user) {
         return userService.update(id, user).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
