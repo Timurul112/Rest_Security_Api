@@ -5,6 +5,8 @@ import com.example.rest_security_api.entity.Status;
 import lombok.Builder;
 import lombok.Value;
 
+import java.util.List;
+
 @Value
 @Builder
 public class UserReadDto {

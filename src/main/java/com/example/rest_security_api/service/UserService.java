@@ -19,14 +19,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private UserRepository userRepository;
-    private UserReadMapper userReadMapper;
-    private UserCreateEditMapper userCreateEditMapper;
+
+    private final UserRepository userRepository;
+    private final UserReadMapper userReadMapper;
+    private final UserCreateEditMapper userCreateEditMapper;
+
+    private final FileService fileService;
 
 
     public List<UserReadDto> findAll() {
@@ -56,7 +59,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public boolean delete(Integer id) {
-       return userRepository.findById(id)
+        return userRepository.findById(id)
                 .map(user -> {
                     userRepository.delete(user);
                     return true;
@@ -64,13 +67,14 @@ public class UserService implements UserDetailsService {
                 .orElse(false);
     }
 
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserByUsername(username)
+        return userRepository.findByUsername(username)
                 .map(user -> new org.springframework.security.core.userdetails.User(
                         user.getUsername(),
                         user.getPassword(),
                         Collections.singleton(user.getRole())
-                )).orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
+                )).orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user" + username));
     }
 }

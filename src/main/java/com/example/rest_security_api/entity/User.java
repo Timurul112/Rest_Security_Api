@@ -1,12 +1,13 @@
 package com.example.rest_security_api.entity;
 
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,9 +31,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Transient
+    List<String> fileKeys = new ArrayList<>();
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Event> events;
-
 
 }
 
