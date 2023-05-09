@@ -29,7 +29,6 @@ public class UserService implements UserDetailsService {
     private final UserReadMapper userReadMapper;
     private final UserCreateEditMapper userCreateEditMapper;
 
-    private final FileService fileService;
 
 
     public List<UserReadDto> findAll() {

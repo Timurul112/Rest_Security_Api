@@ -1,20 +1,15 @@
 package com.example.rest_security_api.rest;
 
-import com.example.rest_security_api.entity.File;
-import com.example.rest_security_api.entity.Role;
+import com.example.rest_security_api.dto.FileReadDto;
 import com.example.rest_security_api.service.FileService;
 import com.example.rest_security_api.service.UserService;
-import com.example.rest_security_api.util.RoleFromUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.example.rest_security_api.entity.Role.*;
 
 @RestController
 @RequestMapping("api/v1/files")
@@ -23,7 +18,7 @@ public class FileRestControllerV1 {
 
 
     private final FileService fileService;
-    private final UserService userService;
+//    private final UserService userService;
 
 
     @GetMapping
@@ -34,15 +29,21 @@ public class FileRestControllerV1 {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'USER')")
-    public Optional<File> getById(@PathVariable Integer id, @RequestParam Integer userId, @RequestParam String key) {
-
-
-//        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String userDetailsRole = RoleFromUserDetails.getRole(userDetails);
-//        if (userDetailsRole.equals(ADMIN.name()) || userDetailsRole.equals(USER.name())) {
-//            fileService.getById(key);
-//        } else {
-//            userService.getById()
-
-
+    @PostAuthorize("(hasRole('USER') and returnObject.get().createdBy == authentication.principal.username) or " +
+            "hasAnyRole('MODERATOR', 'ADMIN')")
+    public Optional<FileReadDto> getById(@PathVariable(name = "id") Integer fileId) {
+        return fileService.getById(fileId);
     }
+
+    @PostMapping
+    public void upload(@RequestBody String fileContent, @RequestParam String username, @RequestParam String fileName) {
+        fileService.uploadFile(fileName, fileContent, username);
+    }
+
+
+
+
+
+
+
+}

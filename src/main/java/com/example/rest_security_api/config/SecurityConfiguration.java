@@ -1,10 +1,8 @@
 package com.example.rest_security_api.config;
 
 
-import com.example.rest_security_api.entity.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -20,6 +18,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .authorizeHttpRequests(urlConfig -> urlConfig
+                        .antMatchers("/api/v1/users/**").permitAll()
+                )
                 .formLogin();
     }
 

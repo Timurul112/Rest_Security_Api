@@ -24,7 +24,7 @@ public class UserRestControllerV1 {
 
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') and hasAuthority('MODERATOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
     public List<UserReadDto> findAll() {
         return userService.findAll();
     }

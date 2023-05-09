@@ -13,6 +13,7 @@ public class UserReadMapper implements Mapper<User, UserReadDto> {
                 .username(entity.getUsername())
                 .role(entity.getRole())
                 .status(entity.getStatus())
+                .fileKeys(entity.getFileKeys())
                 .build();
     }
 }

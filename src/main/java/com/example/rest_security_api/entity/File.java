@@ -23,6 +23,9 @@ public class File {
 
     private String location;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 

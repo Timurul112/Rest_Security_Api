@@ -34,8 +34,8 @@ public class S3Service {
         return s3client.listBuckets();
     }
 
-    public void uploadFile(String BUCKET_NAME, String key, InputStream inputStream) { //для всех
-        s3client.putObject(BUCKET_NAME, key, inputStream, null);
+    public void uploadFile(String BUCKET_NAME, String key, String content) { //для всех
+        s3client.putObject(BUCKET_NAME, key, content);
     }
 
     public List<String> getListFiles() { //для админа

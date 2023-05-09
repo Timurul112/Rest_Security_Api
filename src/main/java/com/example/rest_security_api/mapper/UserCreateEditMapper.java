@@ -13,8 +13,8 @@ public class UserCreateEditMapper implements Mapper<UserCreateEditDto, User> {
 
 
     public User copy(UserCreateEditDto userDto, User user) {
-        user.setPassword(passwordEncoder.encode(userDto.getRawPassword()));
         user.setUsername(userDto.getUsername());
+        user.setPassword(passwordEncoder.encode(userDto.getRawPassword()));
         return user;
     }
 

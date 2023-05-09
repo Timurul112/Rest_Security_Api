@@ -12,7 +12,8 @@ CREATE TABLE files
     id       SERIAL PRIMARY KEY,
     name     VARCHAR(128) NOT NULL,
     location VARCHAR(128) NOT NULL,
-    status   VARCHAR(128) NOT NULL DEFAULT 'SAVED'
+    status   VARCHAR(128) NOT NULL DEFAULT 'SAVED',
+    created_by VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE events
