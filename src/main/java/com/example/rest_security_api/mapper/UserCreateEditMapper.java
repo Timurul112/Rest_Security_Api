@@ -22,10 +22,15 @@ public class UserCreateEditMapper implements Mapper<UserCreateEditDto, User> {
 
 
     @Override
-    public User map(UserCreateEditDto entity) {
+    public User mapToDto(UserCreateEditDto entity) {
         return User.builder()
                 .username(entity.getUsername())
                 .password(passwordEncoder.encode(entity.getRawPassword()))
                 .build();
+    }
+
+    @Override
+    public UserCreateEditDto mapToEntity(User dto) {
+        return null;
     }
 }

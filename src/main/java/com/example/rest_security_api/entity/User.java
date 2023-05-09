@@ -1,10 +1,7 @@
 package com.example.rest_security_api.entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -31,12 +28,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+
     @Transient
     List<String> fileKeys = new ArrayList<>();
 
+
+    @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL)
     private List<Event> events;
-
 }
 
 

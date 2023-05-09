@@ -32,20 +32,20 @@ public class UserService implements UserDetailsService {
 
 
     public List<UserReadDto> findAll() {
-        return userRepository.findAll().stream().map(userReadMapper::map).toList();
+        return userRepository.findAll().stream().map(userReadMapper::mapToDto).toList();
     }
 
     public Optional<UserReadDto> getById(Integer id) {
-        return userRepository.findById(id).map(userReadMapper::map);
+        return userRepository.findById(id).map(userReadMapper::mapToDto);
     }
 
 
     @Transactional
     public UserReadDto create(UserCreateEditDto userDto) {
-        User saveUser = userCreateEditMapper.map(userDto);
+        User saveUser = userCreateEditMapper.mapToDto(userDto);
         saveUser.setRole(Role.USER);
         saveUser.setStatus(Status.ACTIVE);
-        return userReadMapper.map(userRepository.save(saveUser));
+        return userReadMapper.mapToDto(userRepository.save(saveUser));
     }
 
     @Transactional
@@ -53,7 +53,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(userId)
                 .map(user -> userCreateEditMapper.copy(userDto, user))
                 .map(userRepository::saveAndFlush)
-                .map(userReadMapper::map);
+                .map(userReadMapper::mapToDto);
     }
 
     @Transactional
@@ -64,6 +64,16 @@ public class UserService implements UserDetailsService {
                     return true;
                 })
                 .orElse(false);
+    }
+
+    public User getByUsername(String username) {
+
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+
+        } else throw new RuntimeException("нет такого пользователя");
+//        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User does not exist"));
     }
 
 

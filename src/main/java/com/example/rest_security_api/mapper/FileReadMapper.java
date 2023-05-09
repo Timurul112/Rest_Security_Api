@@ -7,12 +7,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileReadMapper implements Mapper<File, FileReadDto> {
     @Override
-    public FileReadDto map(File entity) {
+    public FileReadDto mapToDto(File entity) {
         return FileReadDto.builder()
                 .name(entity.getName())
-                .status(entity.getStatus().name())
+                .status(entity.getStatus())
                 .location(entity.getLocation())
                 .createdBy(entity.getCreatedBy())
+                .build();
+    }
+
+    @Override
+    public File mapToEntity(FileReadDto dto) {
+        return File.builder()
+                .name(dto.getName())
+                .location(dto.getLocation())
+                .status(dto.getStatus())
+                .createdBy(dto.getCreatedBy())
                 .build();
     }
 }

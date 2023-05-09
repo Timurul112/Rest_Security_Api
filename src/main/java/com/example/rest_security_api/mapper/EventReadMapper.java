@@ -11,11 +11,16 @@ public class EventReadMapper implements Mapper<Event, EventReadDto> {
 
 
     @Override
-    public EventReadDto map(Event entity) {
+    public EventReadDto mapToDto(Event entity) {
 
         return EventReadDto.builder()
                 .userId(entity.getUser().getId())
                 .fileId(entity.getFile().getId())
                 .status(entity.getStatus()).build();
+    }
+
+    @Override
+    public Event mapToEntity(EventReadDto dto) {
+        return null;
     }
 }
