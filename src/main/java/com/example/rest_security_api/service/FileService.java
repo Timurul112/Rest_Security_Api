@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +30,9 @@ public class FileService {
     private final EventService eventService;
 
     private final EventUserUtil eventUserUtil;
+
+
+
 
 
     public Optional<FileReadDto> getById(Integer fileId) {
@@ -66,10 +71,29 @@ public class FileService {
     }
 
     @Transactional
-    public void deleteByName(String fileName, String username) {
+    public void deleteFileByName(String fileName, String username) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         Event event = eventUserUtil.getEventAndUpdateFileKey(file, username);
         eventService.save(event);
         s3Service.deleteFile(BUCKET_NAME, fileName);
+    }
+
+    @Transactional
+    public String downloadOwnFile(String username, String fileName) throws IOException {
+        File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        if (!file.getCreatedBy().equals(fileName)) {
+            throw new AccessDeniedException("No access to file");
+        }
+        Event event = eventUserUtil.getEvent(file, username);
+        eventService.save(event);
+        return s3Service.downloadFile(fileName);
+    }
+
+    @Transactional
+    public String downloadFileByName(String username, String fileName) throws IOException {
+        File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        Event event = eventUserUtil.getEvent(file, username);
+        eventService.save(event);
+        return s3Service.downloadFile(fileName);
     }
 }

@@ -31,7 +31,7 @@ public class EventUserUtil {
 
     public Event getEventAndUpdateFileKey(String username, String fileName) {
         User user = userService.getByUsername(username);
-        String location = GetLocationFile.getLocation(BUCKET_NAME, fileName);
+        String location = GetLocationFileUtil.getLocation(BUCKET_NAME, fileName);
         File savedFile = File.builder()
                 .createdBy(username)
                 .status(Status.ACTIVE)
@@ -46,4 +46,16 @@ public class EventUserUtil {
                 .status(Status.ACTIVE)
                 .build();
     }
+
+    public Event getEvent(File file, String username) {
+        User user = userService.getByUsername(username);
+        return Event.builder()
+                .user(user)
+                .file(file)
+                .status(Status.ACTIVE)
+                .build();
+    }
+
+
+
 }

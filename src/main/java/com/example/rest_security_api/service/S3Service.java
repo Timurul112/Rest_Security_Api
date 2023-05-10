@@ -51,10 +51,10 @@ public class S3Service {
     }
 
 
-    public byte[] downloadFile(String key) throws IOException {
+    public String downloadFile(String key) throws IOException {
         S3Object object = s3client.getObject(BUCKET_NAME, key);
         S3ObjectInputStream objectContent = object.getObjectContent();
-        return IOUtils.toByteArray(objectContent);
+        return IOUtils.toByteArray(objectContent).toString();
     }
 
     public String getFileMetadata(String key) {
