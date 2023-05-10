@@ -34,7 +34,8 @@ public class User {
 
 
     @ToString.Exclude
-    @OneToMany(cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Event> events;
 }
 

@@ -41,20 +41,19 @@ public class FileRestControllerV1 {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
     public void upload(@RequestBody String fileContent, @RequestParam String username, @RequestParam String fileName) {
-        fileService.uploadFile(fileName, fileContent, username);
+        fileService.uploadFileInS3(fileName, fileContent, username);
     }
 
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-//    @PreAuthorize("hasAuthority('USER')")
     public void deleteByName(@RequestParam String fileName, @RequestParam String username) {
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         String firstAuthority = authorities.iterator().next().getAuthority();
         if (firstAuthority.equals("USER")) {
             fileService.deleteOwnFile(fileName, username);
         }
-        fileService.deleteByName(fileName, userId);
+        fileService.deleteByName(fileName, username);
     }
 }

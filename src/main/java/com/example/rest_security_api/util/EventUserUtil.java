@@ -4,8 +4,7 @@ import com.example.rest_security_api.entity.Event;
 import com.example.rest_security_api.entity.File;
 import com.example.rest_security_api.entity.Status;
 import com.example.rest_security_api.entity.User;
-import com.example.rest_security_api.repository.EventRepository;
-import com.example.rest_security_api.service.FileService;
+import com.example.rest_security_api.repository.FileRepository;
 import com.example.rest_security_api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,9 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EventUserUtil {
+    public static String BUCKET_NAME = "timurul112bucket";
 
     private final UserService userService;
-    private final FileService fileService;
+    private final FileRepository fileRepository;
+
 
     public Event getEventAndUpdateFileKey(File file, String username) {
         User user = userService.getByUsername(username);
@@ -30,14 +31,19 @@ public class EventUserUtil {
 
     public Event getEventAndUpdateFileKey(String username, String fileName) {
         User user = userService.getByUsername(username);
-        File file = fileService.saveFileInDataBase(username, fileName);
+        String location = GetLocationFile.getLocation(BUCKET_NAME, fileName);
+        File savedFile = File.builder()
+                .createdBy(username)
+                .status(Status.ACTIVE)
+                .name(fileName)
+                .location(location)
+                .build();
+        fileRepository.save(savedFile);
         user.getFileKeys().add(fileName);
         return Event.builder()
-                .file(file)
+                .file(savedFile)
                 .user(user)
                 .status(Status.ACTIVE)
                 .build();
     }
-
-
 }
