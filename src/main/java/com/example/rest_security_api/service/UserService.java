@@ -30,7 +30,6 @@ public class UserService implements UserDetailsService {
     private final UserCreateEditMapper userCreateEditMapper;
 
 
-
     public List<UserReadDto> findAll() {
         return userRepository.findAll().stream().map(userReadMapper::mapToDto).toList();
     }
@@ -67,13 +66,11 @@ public class UserService implements UserDetailsService {
     }
 
     public User getByUsername(String username) {
-
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
             return optionalUser.get();
 
-        } else throw new RuntimeException("нет такого пользователя");
-//        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User does not exist"));
+        } else throw new RuntimeException("User does not exist");
     }
 
 

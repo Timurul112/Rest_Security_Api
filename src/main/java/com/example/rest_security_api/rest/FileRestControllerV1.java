@@ -3,10 +3,14 @@ package com.example.rest_security_api.rest;
 import com.example.rest_security_api.dto.FileReadDto;
 import com.example.rest_security_api.service.FileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,15 +38,23 @@ public class FileRestControllerV1 {
     }
 
     @PostMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
     public void upload(@RequestBody String fileContent, @RequestParam String username, @RequestParam String fileName) {
         fileService.uploadFile(fileName, fileContent, username);
     }
 
 
-
-
-
-
-
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
+//    @PreAuthorize("hasAuthority('USER')")
+    public void deleteByName(@RequestParam String fileName, @RequestParam String username) {
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String firstAuthority = authorities.iterator().next().getAuthority();
+        if (firstAuthority.equals("USER")) {
+            fileService.deleteOwnFile(fileName, username);
+        }
+        fileService.deleteByName(fileName, userId);
+    }
 }
