@@ -61,8 +61,9 @@ public class FileRestControllerV1 {
         String username = AuthenticationUtil.getUsername();
         if (authority.equals("USER")) {
             fileService.deleteOwnFile(fileName, username);
+        } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
+            fileService.deleteFileByName(fileName, username);
         }
-        fileService.deleteFileByName(fileName, username);
     }
 
 
@@ -78,10 +79,23 @@ public class FileRestControllerV1 {
             try (PrintWriter writer = response.getWriter()) {
                 writer.write(result);
             }
+        } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
+            String result = fileService.downloadFileByName(username, fileName);
+            try (PrintWriter writer = response.getWriter()) {
+                writer.write(result);
+            }
         }
-        String result = fileService.downloadFileByName(username, fileName);
-        try (PrintWriter writer = response.getWriter()) {
-            writer.write(result);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
+    public void updateFile(@RequestBody String updateFileContent, @RequestParam String fileName) {
+        String authority = AuthenticationUtil.getAuthority();
+        String username = AuthenticationUtil.getUsername();
+        if (authority.equals("USER")) {
+            fileService.updateOwnFile(updateFileContent, username, fileName);
+        } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
+            fileService.updateFileByName(updateFileContent, username, fileName);
         }
     }
 }

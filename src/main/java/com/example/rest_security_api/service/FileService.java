@@ -32,9 +32,6 @@ public class FileService {
     private final EventUserUtil eventUserUtil;
 
 
-
-
-
     public Optional<FileReadDto> getById(Integer fileId) {
         Optional<File> optionalFile = fileRepository.findById(fileId);
         if (optionalFile.isEmpty()) {
@@ -47,7 +44,6 @@ public class FileService {
     public List<String> getAll() {
         return s3Service.getListFiles();
     }
-
 
 
     @Transactional
@@ -73,6 +69,7 @@ public class FileService {
     @Transactional
     public void deleteFileByName(String fileName, String username) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        file.setStatus(Status.DELETED);
         Event event = eventUserUtil.getEventAndUpdateFileKey(file, username);
         eventService.save(event);
         s3Service.deleteFile(BUCKET_NAME, fileName);
@@ -95,5 +92,25 @@ public class FileService {
         Event event = eventUserUtil.getEvent(file, username);
         eventService.save(event);
         return s3Service.downloadFile(fileName);
+    }
+
+
+    @Transactional
+    public void updateOwnFile(String updateFileContent, String username, String fileName) {
+        File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        if (!file.getCreatedBy().equals(username)) {
+            throw new RuntimeException("No access to file");
+        }
+        Event event = eventUserUtil.getEvent(file, username);
+        eventService.save(event);
+        s3Service.uploadFile(BUCKET_NAME, fileName, updateFileContent);
+    }
+
+    @Transactional
+    public void updateFileByName(String updateFileContent, String username, String fileName) {
+        File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        Event event = eventUserUtil.getEvent(file, username);
+        eventService.save(event);
+        s3Service.uploadFile(BUCKET_NAME, fileName, updateFileContent);
     }
 }

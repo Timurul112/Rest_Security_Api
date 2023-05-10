@@ -9,10 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -54,22 +53,10 @@ public class S3Service {
     public String downloadFile(String key) throws IOException {
         S3Object object = s3client.getObject(BUCKET_NAME, key);
         S3ObjectInputStream objectContent = object.getObjectContent();
-        return IOUtils.toByteArray(objectContent).toString();
+        return Arrays.toString(IOUtils.toByteArray(objectContent));
     }
-
-    public String getFileMetadata(String key) {
-        ObjectMetadata objectMetadata = s3client.getObjectMetadata(BUCKET_NAME, key);
-        long fileSize = objectMetadata.getContentLength();
-        String lastDateModified = objectMetadata.getLastModified().toString();
-        return "File size: " + fileSize + ", last date modified: " + lastDateModified + ", key name: " + key;
-    }
-
-
-
 
     public void deleteFile(String BUCKET_NAME, String key) {
         s3client.deleteObject(BUCKET_NAME, key);
     }
-
-
 }
