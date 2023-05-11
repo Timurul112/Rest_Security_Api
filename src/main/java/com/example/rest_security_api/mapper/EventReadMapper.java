@@ -2,7 +2,6 @@ package com.example.rest_security_api.mapper;
 
 import com.example.rest_security_api.dto.EventDto;
 import com.example.rest_security_api.entity.Event;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -33,10 +33,9 @@ public class User {
     List<String> fileKeys = new ArrayList<>();
 
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
+
 }
 
 
