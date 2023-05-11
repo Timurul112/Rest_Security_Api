@@ -1,6 +1,6 @@
 package com.example.rest_security_api.rest;
 
-import com.example.rest_security_api.dto.EventReadDto;
+import com.example.rest_security_api.dto.EventDto;
 import com.example.rest_security_api.entity.Event;
 import com.example.rest_security_api.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +22,14 @@ public class EventRestControllerV1 {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<EventReadDto> getAll() {
+    public List<EventDto> getAll() {
         return eventService.getAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") //оттестировать
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-//    @PostAuthorize("(hasAuthority('USER') and returnObject.get().user.username == authentication.principal.username)" +
-//            "or hasAnyAuthority('MODERATOR', 'ADMIN')")
+    @PostAuthorize("(hasAuthority('USER') and returnObject.get().user.username == authentication.principal.username)" +
+            "or hasAnyAuthority('MODERATOR', 'ADMIN')")
     public Optional<Event> getEventById(@PathVariable(name = "id") Integer eventId) {
         return eventService.getById(eventId);
     }

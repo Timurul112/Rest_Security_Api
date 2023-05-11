@@ -7,9 +7,11 @@ import lombok.Value;
 
 @Value
 @Builder
-public class EventReadDto {
-    Integer userId;
-    Integer fileId;
-    //enum type operation
+public class FileDto {
+
+    String name;
+    String location;
     Status status;
+    String createdBy;
+
 }

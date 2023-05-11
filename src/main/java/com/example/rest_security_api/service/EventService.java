@@ -1,7 +1,7 @@
 package com.example.rest_security_api.service;
 
 
-import com.example.rest_security_api.dto.EventReadDto;
+import com.example.rest_security_api.dto.EventDto;
 import com.example.rest_security_api.entity.Event;
 import com.example.rest_security_api.mapper.EventReadMapper;
 import com.example.rest_security_api.repository.EventRepository;
@@ -26,7 +26,7 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    public List<EventReadDto> getAll() {
+    public List<EventDto> getAll() {
         List<Event> eventsList = eventRepository.findAll();
         return eventsList.stream()
                 .map(eventReadMapper::mapToDto).toList();

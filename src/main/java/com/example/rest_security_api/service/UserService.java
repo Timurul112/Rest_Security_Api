@@ -1,12 +1,14 @@
 package com.example.rest_security_api.service;
 
-import com.example.rest_security_api.dto.UserCreateEditDto;
+import com.example.rest_security_api.dto.UserCreateDto;
 import com.example.rest_security_api.dto.UserReadDto;
+import com.example.rest_security_api.dto.UserUpdateDto;
 import com.example.rest_security_api.entity.Role;
 import com.example.rest_security_api.entity.Status;
 import com.example.rest_security_api.entity.User;
-import com.example.rest_security_api.mapper.UserCreateEditMapper;
+import com.example.rest_security_api.mapper.UserCreateMapper;
 import com.example.rest_security_api.mapper.UserReadMapper;
+import com.example.rest_security_api.mapper.UserUpdateMapper;
 import com.example.rest_security_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +29,9 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserReadMapper userReadMapper;
-    private final UserCreateEditMapper userCreateEditMapper;
+    private final UserCreateMapper userCreateMapper;
+
+    private final UserUpdateMapper userUpdateMapper;
 
 
     public List<UserReadDto> findAll() {
@@ -40,20 +44,31 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public UserReadDto create(UserCreateEditDto userDto) {
-        User saveUser = userCreateEditMapper.mapToDto(userDto);
+    public UserReadDto create(UserCreateDto userCreateDto) {
+        User saveUser = userCreateMapper.mapToEntity(userCreateDto);
         saveUser.setRole(Role.USER);
         saveUser.setStatus(Status.ACTIVE);
         return userReadMapper.mapToDto(userRepository.save(saveUser));
     }
 
-    @Transactional
-    public Optional<UserReadDto> update(Integer userId, UserCreateEditDto userDto) {
-        return userRepository.findById(userId)
-                .map(user -> userCreateEditMapper.copy(userDto, user))
-                .map(userRepository::saveAndFlush)
-                .map(userReadMapper::mapToDto);
+    public UserReadDto updateOwnUser(UserUpdateDto userUpdateDto, Integer changeId, String authUsername) {
+        User authUser = userRepository.findByUsername(authUsername).orElseThrow(() -> new RuntimeException("User does not exist"));
+        if (!authUser.getId().equals(changeId)) {
+            throw new RuntimeException("No access to user");
+        } else {
+            User updatedUser = userUpdateMapper.copy(userUpdateDto, authUser);
+            User savedUpdateUser = userRepository.save(updatedUser);
+            return userReadMapper.mapToDto(savedUpdateUser);
+        }
     }
+
+    public UserReadDto updateById(Integer changeId, UserUpdateDto userUpdateDto) {
+        User user = userRepository.getById(changeId);
+        User updatedUser = userUpdateMapper.copy(userUpdateDto, user);
+        User savedUpdatedUser = userRepository.save(updatedUser);
+        return userReadMapper.mapToDto(savedUpdatedUser);
+    }
+
 
     @Transactional
     public boolean delete(Integer id) {

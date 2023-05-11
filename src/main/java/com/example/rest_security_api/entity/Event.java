@@ -27,9 +27,8 @@ public class Event {
     @JoinColumn(name = "user_id")
     private User user;
 
-
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Operation typeOperation;
 
 
 }

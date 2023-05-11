@@ -1,6 +1,6 @@
 package com.example.rest_security_api.service;
 
-import com.example.rest_security_api.dto.FileReadDto;
+import com.example.rest_security_api.dto.FileDto;
 import com.example.rest_security_api.entity.Event;
 import com.example.rest_security_api.entity.File;
 import com.example.rest_security_api.entity.Status;
@@ -32,7 +32,7 @@ public class FileService {
     private final EventUserUtil eventUserUtil;
 
 
-    public Optional<FileReadDto> getById(Integer fileId) {
+    public Optional<FileDto> getById(Integer fileId) {
         Optional<File> optionalFile = fileRepository.findById(fileId);
         if (optionalFile.isEmpty()) {
             throw new RuntimeException("Record not found");
@@ -81,7 +81,7 @@ public class FileService {
         if (!file.getCreatedBy().equals(fileName)) {
             throw new AccessDeniedException("No access to file");
         }
-        Event event = eventUserUtil.getEvent(file, username);
+        Event event = eventUserUtil.getEventForDownloadFile(file, username);
         eventService.save(event);
         return s3Service.downloadFile(fileName);
     }
@@ -89,7 +89,7 @@ public class FileService {
     @Transactional
     public String downloadFileByName(String username, String fileName) throws IOException {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
-        Event event = eventUserUtil.getEvent(file, username);
+        Event event = eventUserUtil.getEventForDownloadFile(file, username);
         eventService.save(event);
         return s3Service.downloadFile(fileName);
     }
@@ -101,7 +101,7 @@ public class FileService {
         if (!file.getCreatedBy().equals(username)) {
             throw new RuntimeException("No access to file");
         }
-        Event event = eventUserUtil.getEvent(file, username);
+        Event event = eventUserUtil.getEventForUpdateFile(file, username);
         eventService.save(event);
         s3Service.uploadFile(BUCKET_NAME, fileName, updateFileContent);
     }
@@ -109,7 +109,7 @@ public class FileService {
     @Transactional
     public void updateFileByName(String updateFileContent, String username, String fileName) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
-        Event event = eventUserUtil.getEvent(file, username);
+        Event event = eventUserUtil.getEventForUpdateFile(file, username);
         eventService.save(event);
         s3Service.uploadFile(BUCKET_NAME, fileName, updateFileContent);
     }

@@ -19,7 +19,7 @@ CREATE TABLE files
 CREATE TABLE events
 (
     id      SERIAL PRIMARY KEY,
-    status  VARCHAR(128) NOT NULL DEFAULT 'ACTIVE',
+    operation VARCHAR(50) NOT NULL,
     user_id INTEGER      NOT NULL REFERENCES users (id),
     file_id INTEGER      NOT NULL REFERENCES files (id)
 );

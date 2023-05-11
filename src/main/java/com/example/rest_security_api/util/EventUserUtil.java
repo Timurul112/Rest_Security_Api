@@ -1,9 +1,6 @@
 package com.example.rest_security_api.util;
 
-import com.example.rest_security_api.entity.Event;
-import com.example.rest_security_api.entity.File;
-import com.example.rest_security_api.entity.Status;
-import com.example.rest_security_api.entity.User;
+import com.example.rest_security_api.entity.*;
 import com.example.rest_security_api.repository.FileRepository;
 import com.example.rest_security_api.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +21,7 @@ public class EventUserUtil {
         return Event.builder()
                 .file(file)
                 .user(user)
-                .status(Status.ACTIVE)
+                .typeOperation(Operation.DELETED)
                 .build();
     }
 
@@ -43,16 +40,24 @@ public class EventUserUtil {
         return Event.builder()
                 .file(savedFile)
                 .user(user)
-                .status(Status.ACTIVE)
+                .typeOperation(Operation.CREATE)
                 .build();
     }
 
-    public Event getEvent(File file, String username) {
+    public Event getEventForDownloadFile(File file, String username) {
         User user = userService.getByUsername(username);
         return Event.builder()
                 .user(user)
                 .file(file)
-                .status(Status.ACTIVE)
+                .typeOperation(Operation.DOWNLOADED)
+                .build();
+    }
+  public Event getEventForUpdateFile(File file, String username) {
+        User user = userService.getByUsername(username);
+        return Event.builder()
+                .user(user)
+                .file(file)
+                .typeOperation(Operation.UPDATE)
                 .build();
     }
 

@@ -1,6 +1,6 @@
 package com.example.rest_security_api.rest;
 
-import com.example.rest_security_api.dto.FileReadDto;
+import com.example.rest_security_api.dto.FileDto;
 import com.example.rest_security_api.service.FileService;
 import com.example.rest_security_api.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class FileRestControllerV1 {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
     @PostAuthorize("(hasAuthority('USER') and returnObject.get().createdBy == authentication.principal.username) or " +
             "hasAnyAuthority('MODERATOR', 'ADMIN')")
-    public Optional<FileReadDto> getById(@PathVariable(name = "id") Integer fileId) {
+    public Optional<FileDto> getById(@PathVariable(name = "id") Integer fileId) {
         return fileService.getById(fileId);
     }
 

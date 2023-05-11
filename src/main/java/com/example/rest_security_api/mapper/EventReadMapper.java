@@ -1,26 +1,26 @@
 package com.example.rest_security_api.mapper;
 
-import com.example.rest_security_api.dto.EventReadDto;
+import com.example.rest_security_api.dto.EventDto;
 import com.example.rest_security_api.entity.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class EventReadMapper implements Mapper<Event, EventReadDto> {
+public class EventReadMapper implements Mapper<Event, EventDto> {
 
 
     @Override
-    public EventReadDto mapToDto(Event entity) {
+    public EventDto mapToDto(Event entity) {
 
-        return EventReadDto.builder()
+        return EventDto.builder()
                 .userId(entity.getUser().getId())
                 .fileId(entity.getFile().getId())
-                .status(entity.getStatus()).build();
+                .typeOperation(entity.getTypeOperation())
+                .build();
     }
 
     @Override
-    public Event mapToEntity(EventReadDto dto) {
+    public Event mapToEntity(EventDto dto) {
         return null;
     }
 }
