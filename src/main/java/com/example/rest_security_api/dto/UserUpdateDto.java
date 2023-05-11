@@ -1,10 +1,8 @@
 package com.example.rest_security_api.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 
-@Value
-@Builder
+@Getter
 public class UserUpdateDto {
     String username;
 }
