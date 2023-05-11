@@ -37,16 +37,8 @@ public class UserRestControllerV1 {
     public UserReadDto getById(@PathVariable Integer id) {
         return userService.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserReadDto create(@RequestBody UserCreateDto user) {
-        return userService.create(user);
-    }
-
-
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
+    @PreAuthorize(value = "hasAnyAuthority('MODERATOR', 'ADMIN', 'USER')")
     public UserReadDto updateWithoutPassword(@PathVariable(name = "id") Integer changeId, @RequestBody UserUpdateDto userUpdate) {
         String authority = AuthenticationUtil.getAuthority();
         String authUsername = AuthenticationUtil.getUsername();
@@ -59,11 +51,12 @@ public class UserRestControllerV1 {
             throw new RuntimeException("Enter correct data");
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserReadDto create(@RequestBody UserCreateDto user) {
+        return userService.create(user);
+    }
 
-//    @PatchMapping("/reset-password/{id}")
-//    public void deleteByIdAs() {
-//
-//    }
 
 
     @DeleteMapping("/{id}")
