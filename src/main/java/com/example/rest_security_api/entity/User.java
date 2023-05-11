@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = "events")
 @Table(name = "users")
 public class User {
     @Id
@@ -29,8 +30,9 @@ public class User {
     private Status status;
 
 
-    @Transient
-    List<String> fileKeys = new ArrayList<>();
+//    @Transient
+//    @Builder.Default
+//    List<String> fileKeys = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

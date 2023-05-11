@@ -15,18 +15,17 @@ public class EventUserUtil {
     private final FileRepository fileRepository;
 
 
-    public Event getEventAndUpdateFileKey(File file, String username) {
+    public Event getEventForDelete(File file, String username) {
         User user = userService.getByUsername(username);
-        user.getFileKeys().remove(file.getName());
         return Event.builder()
                 .file(file)
                 .user(user)
-                .typeOperation(Operation.DELETED)
+                .typeOperation(Operation.REMOVE)
                 .build();
     }
 
 
-    public Event getEventAndUpdateFileKey(String username, String fileName) {
+    public Event getEventForDelete(String username, String fileName) {
         User user = userService.getByUsername(username);
         String location = GetLocationFileUtil.getLocation(BUCKET_NAME, fileName);
         File savedFile = File.builder()
@@ -36,11 +35,10 @@ public class EventUserUtil {
                 .location(location)
                 .build();
         fileRepository.save(savedFile);
-        user.getFileKeys().add(fileName);
         return Event.builder()
                 .file(savedFile)
                 .user(user)
-                .typeOperation(Operation.CREATE)
+                .typeOperation(Operation.CREATION)
                 .build();
     }
 
@@ -49,7 +47,7 @@ public class EventUserUtil {
         return Event.builder()
                 .user(user)
                 .file(file)
-                .typeOperation(Operation.DOWNLOADED)
+                .typeOperation(Operation.LOADING)
                 .build();
     }
   public Event getEventForUpdateFile(File file, String username) {

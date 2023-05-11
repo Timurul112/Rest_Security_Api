@@ -13,7 +13,7 @@ public class UserReadMapper implements Mapper<User, UserReadDto> {
                 .username(entity.getUsername())
                 .role(entity.getRole())
                 .status(entity.getStatus())
-                .fileKeys(entity.getFileKeys())
+//                .fileKeys(entity.getFileKeys())
                 .build();
     }
 
@@ -21,7 +21,7 @@ public class UserReadMapper implements Mapper<User, UserReadDto> {
     public User mapToEntity(UserReadDto dto) {
         return User.builder()
                 .username(dto.getUsername())
-                .fileKeys(dto.getFileKeys())
+//                .fileKeys(dto.getFileKeys())
                 .status(dto.getStatus())
                 .role(dto.getRole())
                 .build();

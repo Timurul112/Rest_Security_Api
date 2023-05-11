@@ -1,8 +1,8 @@
 package com.example.rest_security_api.entity;
 
 public enum Operation {
-    CREATE,
+    CREATION,
     UPDATE,
-    DELETED,
-    DOWNLOADED
+    REMOVE,
+    LOADING
 }

@@ -48,7 +48,7 @@ public class FileService {
 
     @Transactional
     public void uploadFileInS3(String fileName, String fileContent, String username) {
-        Event event = eventUserUtil.getEventAndUpdateFileKey(username, fileName);
+        Event event = eventUserUtil.getEventForDelete(username, fileName);
         eventService.save(event);
         s3Service.uploadFile(BUCKET_NAME, fileName, fileContent);
     }
@@ -61,7 +61,7 @@ public class FileService {
             throw new RuntimeException("No access to file");
         }
         file.setStatus(Status.DELETED);
-        Event event = eventUserUtil.getEventAndUpdateFileKey(file, username);
+        Event event = eventUserUtil.getEventForDelete(file, username);
         eventService.save(event);
         s3Service.deleteFile(BUCKET_NAME, fileName);
     }
@@ -70,7 +70,7 @@ public class FileService {
     public void deleteFileByName(String fileName, String username) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         file.setStatus(Status.DELETED);
-        Event event = eventUserUtil.getEventAndUpdateFileKey(file, username);
+        Event event = eventUserUtil.getEventForDelete(file, username);
         eventService.save(event);
         s3Service.deleteFile(BUCKET_NAME, fileName);
     }
@@ -78,7 +78,7 @@ public class FileService {
     @Transactional
     public String downloadOwnFile(String username, String fileName) throws IOException {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
-        if (!file.getCreatedBy().equals(fileName)) {
+        if (!file.getCreatedBy().equals(username)) {
             throw new AccessDeniedException("No access to file");
         }
         Event event = eventUserUtil.getEventForDownloadFile(file, username);

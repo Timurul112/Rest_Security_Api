@@ -4,6 +4,7 @@ package com.example.rest_security_api.rest;
 import com.example.rest_security_api.dto.UserCreateDto;
 import com.example.rest_security_api.dto.UserReadDto;
 import com.example.rest_security_api.dto.UserUpdateDto;
+import com.example.rest_security_api.dto.UserUpdatePasswordDto;
 import com.example.rest_security_api.service.UserService;
 import com.example.rest_security_api.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,14 @@ public class UserRestControllerV1 {
             throw new RuntimeException("Enter correct data");
     }
 
+    @PutMapping("/reset-password/{id}")
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN', 'USER')")
+    public void updatePassword(@PathVariable Integer id, @RequestBody UserUpdatePasswordDto updatePasswordDto) {
+        String authUsername = AuthenticationUtil.getUsername();
+        userService.updatePassword(id, updatePasswordDto, authUsername);
+    }
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserReadDto create(@RequestBody UserCreateDto user) {
@@ -61,9 +70,14 @@ public class UserRestControllerV1 {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Integer id) {
-        if (!userService.delete(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN', 'USER')")
+    public void deleteById(@PathVariable(name = "id") Integer deleteUserId) {
+        String authority = AuthenticationUtil.getAuthority();
+        String authUsername = AuthenticationUtil.getUsername();
+        if (authority.equals("USER")) {
+            userService.deleteOwnUser(authUsername, deleteUserId);
+        } else if ((authority.equals("MODERATOR")) || authority.equals("ADMIN")) {
+            userService.deleteById(deleteUserId);
         }
     }
 }
