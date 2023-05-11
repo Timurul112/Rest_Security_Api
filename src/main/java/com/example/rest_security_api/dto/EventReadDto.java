@@ -10,5 +10,6 @@ import lombok.Value;
 public class EventReadDto {
     Integer userId;
     Integer fileId;
+    //enum type operation
     Status status;
 }
