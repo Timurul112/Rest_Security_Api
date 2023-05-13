@@ -21,7 +21,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileService {
 
-    public static String BUCKET_NAME = "timurul112bucket";
+//    public static String BUCKET_NAME = "timurul112bucket";
+    public static String BUCKET_NAME = "timurul1112bucket";
 
     private final S3Service s3Service;
     private final FileRepository fileRepository;

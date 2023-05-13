@@ -19,7 +19,8 @@ import java.util.List;
 public class S3Service {
 
     private final AmazonS3 s3client;
-    public static String BUCKET_NAME = "timurul112bucket";
+    //    public static String BUCKET_NAME = "timurul112bucket";
+    public static String BUCKET_NAME = "timurul1112bucket";
 
     public void createBucket() {
 

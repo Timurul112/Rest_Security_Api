@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EventUserUtil {
-    public static String BUCKET_NAME = "timurul112bucket";
+    //    public static String BUCKET_NAME = "timurul112bucket";
+    public static String BUCKET_NAME = "timurul1112bucket";
+
 
     private final UserService userService;
     private final FileRepository fileRepository;
@@ -50,7 +52,8 @@ public class EventUserUtil {
                 .typeOperation(Operation.LOADING)
                 .build();
     }
-  public Event getEventForUpdateFile(File file, String username) {
+
+    public Event getEventForUpdateFile(File file, String username) {
         User user = userService.getByUsername(username);
         return Event.builder()
                 .user(user)
@@ -58,7 +61,6 @@ public class EventUserUtil {
                 .typeOperation(Operation.UPDATE)
                 .build();
     }
-
 
 
 }
