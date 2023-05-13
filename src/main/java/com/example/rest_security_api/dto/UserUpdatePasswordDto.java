@@ -5,4 +5,8 @@ import lombok.Getter;
 @Getter
 public class UserUpdatePasswordDto {
     String rawPassword;
+
+    public UserUpdatePasswordDto(String rawPassword) {
+        this.rawPassword = rawPassword;
+    }
 }

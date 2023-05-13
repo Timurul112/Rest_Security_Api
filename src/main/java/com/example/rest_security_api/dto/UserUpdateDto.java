@@ -5,4 +5,8 @@ import lombok.Getter;
 @Getter
 public class UserUpdateDto {
     String username;
+
+    public UserUpdateDto(String username) {
+        this.username = username;
+    }
 }

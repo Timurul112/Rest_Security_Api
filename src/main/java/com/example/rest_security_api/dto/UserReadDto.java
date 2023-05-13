@@ -14,5 +14,4 @@ public class UserReadDto {
     String username;
     Role role;
     Status status;
-//    List<String> fileKeys;
 }
