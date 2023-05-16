@@ -19,11 +19,11 @@ import java.util.List;
 public class S3Service {
 
     private final AmazonS3 s3client;
-    //    public static String BUCKET_NAME = "timurul112bucket";
-    public static String BUCKET_NAME = "timurul1112bucket";
+    public static String BUCKET_NAME = "timurbacket";
+
 
     public void createBucket() {
-
+        System.out.println("пустая строка"); //для удаления
         if (s3client.doesBucketExistV2(BUCKET_NAME)) {
             throw new RuntimeException("Bucket already exists");
         }

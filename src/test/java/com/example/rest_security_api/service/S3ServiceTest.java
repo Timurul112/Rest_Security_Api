@@ -20,7 +20,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class S3ServiceTest {
-    public static String BUCKET_NAME = "timurul1112bucket";
+    public static String BUCKET_NAME = "pes123";
+
 
 
     @Mock

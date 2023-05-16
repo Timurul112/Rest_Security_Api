@@ -22,7 +22,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
 
-    public static String BUCKET_NAME = "timurul112bucket";
+    public static String BUCKET_NAME = "pes123";
+
 
 
     @Mock

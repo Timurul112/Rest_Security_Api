@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4555:4555"

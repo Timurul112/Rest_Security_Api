@@ -35,6 +35,7 @@ public class User {
 //    List<String> fileKeys = new ArrayList<>();
 
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
 
