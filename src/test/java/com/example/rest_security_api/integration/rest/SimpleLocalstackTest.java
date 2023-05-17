@@ -7,17 +7,19 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 @IT
 public class SimpleLocalstackTest {
 
-    @Autowired
-    private S3Service s3Service;
 
     public static String BUCKET_NAME = "pes123";
 
 
-
+    @Autowired
+    private S3Service s3Service;
+    @Autowired
+    private ApplicationContext applicationContext;
 
 
     @BeforeAll

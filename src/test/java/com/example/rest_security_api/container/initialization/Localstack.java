@@ -5,18 +5,19 @@ import lombok.experimental.UtilityClass;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.containers.GenericContainer;
 
 @UtilityClass
 public class Localstack {
-
-    public static final LocalStackContainer container = new LocalStackContainer(DockerImageName.parse("localstack/localstack"))
-            .withServices(LocalStackContainer.Service.S3)
-            .withReuse(true);
+    public static final GenericContainer<?> container = new GenericContainer<>("minio/minio:latest")
+            .withExposedPorts(9000)
+            .withEnv("MINIO_ACCESS_KEY", "accesskey")
+            .withEnv("MINIO_SECRET_KEY", "secretkey")
+            .withCommand("server /data");
 
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
@@ -26,14 +27,4 @@ public class Localstack {
                     .applyTo(applicationContext);
         }
     }
-
-
-
-
-
-
-
-
-
-
 }
