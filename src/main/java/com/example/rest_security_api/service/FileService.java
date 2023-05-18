@@ -1,5 +1,6 @@
 package com.example.rest_security_api.service;
 
+import com.amazonaws.services.s3.model.Bucket;
 import com.example.rest_security_api.dto.FileDto;
 import com.example.rest_security_api.entity.Event;
 import com.example.rest_security_api.entity.File;
@@ -21,7 +22,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileService {
 
-    public static String BUCKET_NAME = "pes123";
 
 
 
@@ -43,21 +43,25 @@ public class FileService {
         }
     }
 
-    public List<String> getAll() {
-        return s3Service.getListFiles();
+    public List<String> getAll(String bucketName) {
+        return s3Service.getListFiles(bucketName);
     }
 
 
     @Transactional
-    public void uploadFileInS3(String fileName, String fileContent, String username) {
-        Event event = eventUserUtil.getEventForDelete(username, fileName);
+    public void uploadFileInS3(String fileName, String fileContent, String username, String bucketName) {
+        List<String> listNameBuckets = s3Service.getListBuckets().stream().map(Bucket::getName).toList();
+        if (!listNameBuckets.contains(bucketName)) {
+            s3Service.createBucket(bucketName);
+        }
+        Event event = eventUserUtil.getEventForUpload(username, fileName, bucketName);
         eventService.save(event);
-        s3Service.uploadFile(BUCKET_NAME, fileName, fileContent);
+        s3Service.uploadFile(bucketName, fileName, fileContent);
     }
 
 
     @Transactional
-    public void deleteOwnFile(String fileName, String username) {
+    public void deleteOwnFile(String fileName, String username, String bucketName) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         if (!file.getCreatedBy().equals(username)) {
             throw new RuntimeException("No access to file");
@@ -65,54 +69,54 @@ public class FileService {
         file.setStatus(Status.DELETED);
         Event event = eventUserUtil.getEventForDelete(file, username);
         eventService.save(event);
-        s3Service.deleteFile(BUCKET_NAME, fileName);
+        s3Service.deleteFile(bucketName, fileName);
     }
 
     @Transactional
-    public void deleteFileByName(String fileName, String username) {
+    public void deleteFileByName(String fileName, String username, String bucketName) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         file.setStatus(Status.DELETED);
         Event event = eventUserUtil.getEventForDelete(file, username);
         eventService.save(event);
-        s3Service.deleteFile(BUCKET_NAME, fileName);
+        s3Service.deleteFile(bucketName, fileName);
     }
 
     @Transactional
-    public String downloadOwnFile(String username, String fileName) throws IOException {
+    public String downloadOwnFile(String username, String fileName, String bucketName) throws IOException {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         if (!file.getCreatedBy().equals(username)) {
             throw new AccessDeniedException("No access to file");
         }
         Event event = eventUserUtil.getEventForDownloadFile(file, username);
         eventService.save(event);
-        return s3Service.downloadFile(fileName);
+        return s3Service.downloadFile(fileName, bucketName);
     }
 
     @Transactional
-    public String downloadFileByName(String username, String fileName) throws IOException {
+    public String downloadFileByName(String username, String fileName, String bucketName) throws IOException {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         Event event = eventUserUtil.getEventForDownloadFile(file, username);
         eventService.save(event);
-        return s3Service.downloadFile(fileName);
+        return s3Service.downloadFile(fileName, bucketName);
     }
 
 
     @Transactional
-    public void updateOwnFile(String updateFileContent, String username, String fileName) {
+    public void updateOwnFile(String updateFileContent, String username, String fileName, String bucketName) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         if (!file.getCreatedBy().equals(username)) {
             throw new RuntimeException("No access to file");
         }
         Event event = eventUserUtil.getEventForUpdateFile(file, username);
         eventService.save(event);
-        s3Service.uploadFile(BUCKET_NAME, fileName, updateFileContent);
+        s3Service.uploadFile(bucketName, fileName, updateFileContent);
     }
 
     @Transactional
-    public void updateFileByName(String updateFileContent, String username, String fileName) {
+    public void updateFileByName(String updateFileContent, String username, String fileName, String bucketName) {
         File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
         Event event = eventUserUtil.getEventForUpdateFile(file, username);
         eventService.save(event);
-        s3Service.uploadFile(BUCKET_NAME, fileName, updateFileContent);
+        s3Service.uploadFile(bucketName, fileName, updateFileContent);
     }
 }

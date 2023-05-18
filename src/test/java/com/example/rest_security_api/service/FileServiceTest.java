@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
 
-    public static String BUCKET_NAME = "pes123";
+    public static String BUCKET_NAME = "timurul112";
 
 
 
@@ -77,9 +77,9 @@ class FileServiceTest {
         listFileMetaData.add("meta_data_file1");
         listFileMetaData.add("meta_data_file2");
 
-        doReturn(listFileMetaData).when(s3Service).getListFiles();
+        doReturn(listFileMetaData).when(s3Service).getListFiles(BUCKET_NAME);
 
-        List<String> actual = fileService.getAll();
+        List<String> actual = fileService.getAll(BUCKET_NAME);
 
         assertThat(actual).isNotEmpty();
         assertThat(actual).hasSize(listFileMetaData.size());
@@ -111,9 +111,9 @@ class FileServiceTest {
                 .build();
 
 
-        doReturn(event).when(eventUserUtil).getEventForDelete(username, fileName);
+        doReturn(event).when(eventUserUtil).getEventForUpload(username, fileName, BUCKET_NAME);
 
-        fileService.uploadFileInS3(fileName, fileContent, username);
+        fileService.uploadFileInS3(fileName, fileContent, username, BUCKET_NAME);
 
 
         verify(eventService, times(1)).save(event);
@@ -148,7 +148,7 @@ class FileServiceTest {
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForDelete(file, username);
 
-        fileService.deleteOwnFile(fileName, username);
+        fileService.deleteOwnFile(fileName, username, BUCKET_NAME);
 
         verify(eventService, times(1)).save(event);
         verify(s3Service, times(1)).deleteFile(BUCKET_NAME, fileName);
@@ -184,7 +184,7 @@ class FileServiceTest {
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForDelete(file, username);
 
-        fileService.deleteFileByName(fileName, username);
+        fileService.deleteFileByName(fileName, username, BUCKET_NAME);
 
         verify(eventService, times(1)).save(event);
         verify(s3Service, times(1)).deleteFile(BUCKET_NAME, fileName);
@@ -219,9 +219,9 @@ class FileServiceTest {
 
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForDownloadFile(file, username);
-        doReturn(result).when(s3Service).downloadFile(fileName);
+        doReturn(result).when(s3Service).downloadFile(fileName, BUCKET_NAME);
 
-        String actual = fileService.downloadOwnFile(username, fileName);
+        String actual = fileService.downloadOwnFile(username, fileName, BUCKET_NAME);
 
 
         verify(eventService, times(1)).save(event);
@@ -257,9 +257,9 @@ class FileServiceTest {
 
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForDownloadFile(file, username);
-        doReturn(result).when(s3Service).downloadFile(fileName);
+        doReturn(result).when(s3Service).downloadFile(fileName, BUCKET_NAME);
 
-        String actual = fileService.downloadFileByName(username, fileName);
+        String actual = fileService.downloadFileByName(username, fileName, BUCKET_NAME);
 
         assertThat(actual).isNotEmpty();
         assertThat(actual).isEqualTo(result);
@@ -298,7 +298,7 @@ class FileServiceTest {
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForUpdateFile(file, username);
 
-        fileService.updateOwnFile(updateFileContent, username, fileName);
+        fileService.updateOwnFile(updateFileContent, username, fileName, BUCKET_NAME);
 
         verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, updateFileContent);
     }
@@ -332,7 +332,7 @@ class FileServiceTest {
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForUpdateFile(file, username);
 
-        fileService.updateFileByName(updateFileContent, username, fileName);
+        fileService.updateFileByName(updateFileContent, username, fileName, BUCKET_NAME);
 
         verify(eventService, times(1)).save(event);
         verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, updateFileContent);

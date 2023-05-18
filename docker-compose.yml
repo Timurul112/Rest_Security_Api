@@ -1,6 +1,17 @@
-version: '3.8'
+#production configuration minio!
+version: "3.8"
+volumes:
+  minio_data:
+
 services:
-  localstack:
-    image: localstack/localstack
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=accesskey
+      - MINIO_ROOT_PASSWORD=secretkey
+    volumes:
+      - minio_data:/data
     ports:
-      - "4555:4555"
+      - 9000:9000
+      - 9001:9001

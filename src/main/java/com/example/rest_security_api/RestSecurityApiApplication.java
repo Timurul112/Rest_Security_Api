@@ -7,8 +7,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class RestSecurityApiApplication {
 
+
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(RestSecurityApiApplication.class, args);
-        System.out.println();
     }
 }

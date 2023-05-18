@@ -19,30 +19,27 @@ import java.util.List;
 public class S3Service {
 
     private final AmazonS3 s3client;
-    public static String BUCKET_NAME = "pes1234";
 
 
-    public void createBucket() {
-        System.out.println("пустая строка");
-        if (s3client.doesBucketExistV2(BUCKET_NAME)) {
+    public void createBucket(String bucketName) {
+        if (s3client.doesBucketExistV2(bucketName)) {
             throw new RuntimeException("Bucket already exists");
         }
-        s3client.createBucket(BUCKET_NAME);
+        s3client.createBucket(bucketName);
     }
 
     public List<Bucket> getListBuckets() { //для админа
         return s3client.listBuckets();
     }
 
-    public void uploadFile(String BUCKET_NAME, String fileName, String content) { //для всех
-        s3client.putObject(BUCKET_NAME, fileName, content);
+    public void uploadFile(String bucketName, String fileName, String content) {
+        s3client.putObject(bucketName, fileName, content);
     }
 
-    public List<String> getListFiles() { //для админа
-        ObjectListing objects = s3client.listObjects(BUCKET_NAME);
+    public List<String> getListFiles(String bucketName) { //для админа
+        ObjectListing objects = s3client.listObjects(bucketName);
         ArrayList<String> result = new ArrayList<>();
         for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-            String bucketName = objectSummary.getBucketName();
             String key = objectSummary.getKey();
             String appendString = "Bucket name- " + bucketName + ", Key name-" + key;
             result.add(appendString);
@@ -51,13 +48,13 @@ public class S3Service {
     }
 
 
-    public String downloadFile(String key) throws IOException {
-        S3Object object = s3client.getObject(BUCKET_NAME, key);
+    public String downloadFile(String key, String bucketName) throws IOException {
+        S3Object object = s3client.getObject(bucketName, key);
         S3ObjectInputStream objectContent = object.getObjectContent();
         return Arrays.toString(IOUtils.toByteArray(objectContent));
     }
 
-    public void deleteFile(String BUCKET_NAME, String key) {
-        s3client.deleteObject(BUCKET_NAME, key);
+    public void deleteFile(String bucketName, String key) {
+        s3client.deleteObject(bucketName, key);
     }
 }

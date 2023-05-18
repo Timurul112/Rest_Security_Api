@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class S3ServiceTest {
-    public static String BUCKET_NAME = "pes123";
+    public static String BUCKET_NAME = "timurul112";
 
 
 
@@ -33,7 +33,7 @@ class S3ServiceTest {
 
     @Test
     void createBucket() {
-        s3Service.createBucket();
+        s3Service.createBucket(BUCKET_NAME);
 
         verify(s3client, times(1)).doesBucketExistV2(BUCKET_NAME);
         verify(s3client, times(1)).createBucket(BUCKET_NAME);
@@ -77,7 +77,7 @@ class S3ServiceTest {
         doReturn(objectListing).when(s3client).listObjects(BUCKET_NAME);
         doReturn(listSummary).when(objectListing).getObjectSummaries();
 
-        List<String> actual = s3Service.getListFiles();
+        List<String> actual = s3Service.getListFiles(BUCKET_NAME);
 
         assertThat(actual).isNotEmpty();
         assertThat(actual).hasSize(listSummary.size());
@@ -95,7 +95,7 @@ class S3ServiceTest {
         doReturn(objectContent).when(object).getObjectContent();
 
 
-        String content = s3Service.downloadFile("file-key");
+        String content = s3Service.downloadFile("file-key", BUCKET_NAME);
         String encodeExpectedResult = Arrays.toString(expectedContent.getBytes());
 
         assertThat(content).isNotEmpty();

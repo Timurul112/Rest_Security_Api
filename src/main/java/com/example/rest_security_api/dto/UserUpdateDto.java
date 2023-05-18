@@ -9,4 +9,7 @@ public class UserUpdateDto {
     public UserUpdateDto(String username) {
         this.username = username;
     }
+
+    public UserUpdateDto() {
+    }
 }

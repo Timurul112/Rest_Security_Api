@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EventUserUtil {
-    //    public static String BUCKET_NAME = "timurul112bucket";
-    public static String BUCKET_NAME = "timurul1112bucket";
 
 
     private final UserService userService;
@@ -27,9 +25,9 @@ public class EventUserUtil {
     }
 
 
-    public Event getEventForDelete(String username, String fileName) {
+    public Event getEventForUpload(String username, String fileName, String bucketName) {
         User user = userService.getByUsername(username);
-        String location = GetLocationFileUtil.getLocation(BUCKET_NAME, fileName);
+        String location = GetLocationFileUtil.getLocation(bucketName, fileName);
         File savedFile = File.builder()
                 .createdBy(username)
                 .status(Status.ACTIVE)

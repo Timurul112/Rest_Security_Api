@@ -6,6 +6,7 @@ import com.example.rest_security_api.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,8 @@ public class FileRestControllerV1 {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<String> getAll() {
-        return fileService.getAll();
+    public List<String> getAll(@RequestParam String bucketName) {
+        return fileService.getAll(bucketName);
     }
 
     @GetMapping("/{id}")
@@ -44,43 +45,44 @@ public class FileRestControllerV1 {
         return fileService.getById(fileId);
     }
 
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    public void upload(@RequestBody String fileContent, @RequestParam String fileName) {
+    public void upload(@RequestBody String fileContent, @RequestParam String fileName, @RequestParam String bucketName) {
         String username = AuthenticationUtil.getUsername();
-        fileService.uploadFileInS3(fileName, fileContent, username);
+        fileService.uploadFileInS3(fileName, fileContent, username, bucketName);
     }
 
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    public void deleteByName(@RequestParam String fileName) {
+    public void deleteByName(@RequestParam String fileName, @RequestParam String bucketName) {
         String authority = AuthenticationUtil.getAuthority();
         String username = AuthenticationUtil.getUsername();
         if (authority.equals("USER")) {
-            fileService.deleteOwnFile(fileName, username);
+            fileService.deleteOwnFile(fileName, username, bucketName);
         } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
-            fileService.deleteFileByName(fileName, username);
+            fileService.deleteFileByName(fileName, username, bucketName);
         }
     }
 
 
     @GetMapping("/download/{fileName}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    public void downloadFile(HttpServletResponse response, @PathVariable String fileName) throws IOException {
+    public void downloadFile(HttpServletResponse response, @PathVariable String fileName,
+                             @RequestParam String bucketName) throws IOException {
         String authority = AuthenticationUtil.getAuthority();
         String username = AuthenticationUtil.getUsername();
         response.setContentType("application/json");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(fileName));
         if (authority.equals("USER")) {
-            String result = fileService.downloadOwnFile(username, fileName);
+            String result = fileService.downloadOwnFile(username, fileName,bucketName);
             try (PrintWriter writer = response.getWriter()) {
                 writer.write(result);
             }
         } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
-            String result = fileService.downloadFileByName(username, fileName);
+            String result = fileService.downloadFileByName(username, fileName, bucketName);
             try (PrintWriter writer = response.getWriter()) {
                 writer.write(result);
             }
@@ -89,13 +91,13 @@ public class FileRestControllerV1 {
 
     @PutMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    public void updateFile(@RequestBody String updateFileContent, @RequestParam String fileName) {
+    public void updateFile(@RequestBody String updateFileContent, @RequestParam String fileName, @RequestParam String bucketName) {
         String authority = AuthenticationUtil.getAuthority();
         String username = AuthenticationUtil.getUsername();
         if (authority.equals("USER")) {
-            fileService.updateOwnFile(updateFileContent, username, fileName);
+            fileService.updateOwnFile(updateFileContent, username, fileName, bucketName);
         } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
-            fileService.updateFileByName(updateFileContent, username, fileName);
+            fileService.updateFileByName(updateFileContent, username, fileName, bucketName);
         }
     }
 }

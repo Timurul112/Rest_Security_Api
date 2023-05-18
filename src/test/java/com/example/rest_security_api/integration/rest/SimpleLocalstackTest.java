@@ -1,54 +1,87 @@
 package com.example.rest_security_api.integration.rest;
 
-import com.example.rest_security_api.container.initialization.Localstack;
+import com.example.rest_security_api.container.initialization.Minio;
+import com.example.rest_security_api.container.initialization.Postgres;
+import com.example.rest_security_api.dto.UserCreateDto;
+import com.example.rest_security_api.dto.UserReadDto;
 import com.example.rest_security_api.integration.annotation.IT;
 import com.example.rest_security_api.service.S3Service;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import com.example.rest_security_api.service.UserService;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+
+import java.util.Optional;
 
 @IT
+@ContextConfiguration(initializers = {Minio.Initializer.class, Postgres.Initialization.class})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SimpleLocalstackTest {
 
 
-    public static String BUCKET_NAME = "pes123";
+    public static String BUCKET_NAME = "timurultest";
 
 
     @Autowired
     private S3Service s3Service;
+
     @Autowired
-    private ApplicationContext applicationContext;
+    private UserService userService;
 
 
     @BeforeAll
     static void init() {
-        Localstack.container.start();
+        Minio.container.start();
+        Postgres.container.start();
+
+
+        Flyway flyway = Flyway.configure()
+                .dataSource(Postgres.container.getJdbcUrl(), Postgres.container.getUsername(), Postgres.container.getPassword())
+                .locations("classpath:db/migration")
+                .load();
+        flyway.migrate();
     }
 
 
     @Test
+    @Order(1)
     void createBucketCheck() {
-        s3Service.createBucket();
+        s3Service.createBucket(BUCKET_NAME);
     }
 
 
-
-
-
     @Test
-    void workCheckLocalstack() {
+    @Order(2)
+    void checkUploadFile() {
         String fileName = "file_name";
         String content = "test_content";
         s3Service.uploadFile(BUCKET_NAME, fileName, content);
     }
 
+    @Test
+    @Order(3)
+    void checkCreateUser() {
+        UserCreateDto userCreateDto = UserCreateDto.builder()
+                .username("Timur")
+                .rawPassword("123")
+                .build();
 
-    @AfterAll
-    static void stop() {
-        Localstack.container.stop();
+        userService.create(userCreateDto);
+    }
+
+    @Test
+    @Order(4)
+    void checkGetByIdUser() {
+        Integer userId = 1;
+        Optional<UserReadDto> optionalUserReadDto = userService.getById(userId);
+        optionalUserReadDto.orElseThrow(() -> new RuntimeException("User does not exist"));
     }
 
 
+    @AfterAll
+    static void stop() {
+        Minio.container.stop();
+        Postgres.container.stop();
+    }
 }
