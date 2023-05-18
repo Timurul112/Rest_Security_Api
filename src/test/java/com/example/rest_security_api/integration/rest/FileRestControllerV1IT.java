@@ -43,17 +43,12 @@ class FileRestControllerV1IT {
     }
 
 
-    @Test
-    void checkUserAdd() {
-
-    }
 
     @Test
-    @WithMockUser(username = "Евгений", password = "1234", authorities = "ADMIN") //доделать
+    @WithMockUser(username = "Timur", password = "1234", authorities = "ADMIN") //доделать
     @Order(1)
     void upload() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-
 
         UserCreateDto userCreateDto = UserCreateDto.builder()
                 .username("Timur")
@@ -103,6 +98,7 @@ class FileRestControllerV1IT {
     @Test
     @WithMockUser(username = "Евгений", password = "1234", authorities = "ADMIN")
     void getAll() throws Exception {
+        System.out.println("asdasd");
         mockMvc.perform(get("/api/v1/files/1")
                         .param("bucketName", "timurul"))
                 .andExpect(status().is2xxSuccessful());
@@ -116,7 +112,6 @@ class FileRestControllerV1IT {
 
 
 
-        System.out.println("asdasd");
     }
 
 
