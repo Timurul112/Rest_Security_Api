@@ -9,4 +9,7 @@ public class UserUpdatePasswordDto {
     public UserUpdatePasswordDto(String rawPassword) {
         this.rawPassword = rawPassword;
     }
+
+    public UserUpdatePasswordDto() {
+    }
 }

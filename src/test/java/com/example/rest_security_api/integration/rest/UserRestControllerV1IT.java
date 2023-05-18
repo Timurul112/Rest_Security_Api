@@ -3,6 +3,7 @@ package com.example.rest_security_api.integration.rest;
 import com.example.rest_security_api.container.initialization.Postgres;
 import com.example.rest_security_api.dto.UserCreateDto;
 import com.example.rest_security_api.dto.UserUpdateDto;
+import com.example.rest_security_api.dto.UserUpdatePasswordDto;
 import com.example.rest_security_api.integration.annotation.IT;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.*;
@@ -100,18 +101,21 @@ class UserRestControllerV1IT {
     @Order(5)
     @WithMockUser(username = "Евгений", password = "1234", authorities = "ADMIN")
     void updatePassword() throws Exception {
-
-        mockMvc.perform(put("api/v1/users/reset-password/1"))
-
-
-
-
-
+        UserUpdatePasswordDto updatePasswordDto = new UserUpdatePasswordDto("raw_password");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonRequestBody = objectMapper.writeValueAsString(updatePasswordDto);
+        mockMvc.perform(put("/api/v1/users/reset-password/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequestBody))
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
+    @WithMockUser(username = "Евгений", password = "1234", authorities = "ADMIN")
     @Order(6)
-    void deleteById() {
+    void deleteById() throws Exception {
+        mockMvc.perform(delete("/api/v1/users/1"))
+                .andExpect(status().is2xxSuccessful());
     }
 
 

@@ -17,7 +17,7 @@ import java.util.Optional;
 @IT
 @ContextConfiguration(initializers = {Minio.Initializer.class, Postgres.Initialization.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SimpleLocalstackTest {
+public class TestIntegrationTest {
 
 
     public static String BUCKET_NAME = "timurultest";
