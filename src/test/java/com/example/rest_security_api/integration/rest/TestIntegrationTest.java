@@ -10,6 +10,7 @@ import com.example.rest_security_api.service.UserService;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
@@ -55,8 +56,9 @@ public class TestIntegrationTest {
     @Order(2)
     void checkUploadFile() {
         String fileName = "file_name";
-        String content = "test_content";
-        s3Service.uploadFile(BUCKET_NAME, fileName, content);
+        byte[] contentByte = "upload_test".getBytes();
+        MockMultipartFile multiFile = new MockMultipartFile(fileName, contentByte);
+        s3Service.uploadFile(BUCKET_NAME, fileName, multiFile);
     }
 
     @Test

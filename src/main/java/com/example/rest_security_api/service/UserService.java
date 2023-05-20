@@ -12,6 +12,7 @@ import com.example.rest_security_api.mapper.UserReadMapper;
 import com.example.rest_security_api.mapper.UserUpdateMapper;
 import com.example.rest_security_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -93,6 +95,7 @@ public class UserService implements UserDetailsService {
                         Collections.singleton(user.getRole())
                 )).orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user" + username));
     }
+
 
     @Transactional
     public void deleteOwnUser(String authUsername, Integer deleteUserId) {

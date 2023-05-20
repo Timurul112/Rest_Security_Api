@@ -4,7 +4,7 @@ import com.example.rest_security_api.dto.EventDto;
 import com.example.rest_security_api.entity.Event;
 import com.example.rest_security_api.service.EventService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,15 +22,15 @@ public class EventRestControllerV1 {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<EventDto> getAll() {
-        return eventService.getAll();
+    public ResponseEntity<List<EventDto>> getAll() {
+        List<EventDto> eventListDto = eventService.getAll();
+        return ResponseEntity.ok(eventListDto);
     }
 
-    @GetMapping("/{id}") //оттестировать
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    @PostAuthorize("(hasAuthority('USER') and returnObject.get().user.username == authentication.principal.username)" +
-            "or hasAnyAuthority('MODERATOR', 'ADMIN')")
-    public Optional<Event> getEventById(@PathVariable(name = "id") Integer eventId) {
-        return eventService.getById(eventId);
+    public ResponseEntity<Optional<EventDto>> getEventById(@PathVariable(name = "id") Integer eventId) {
+        Optional<EventDto> optionalEvent = eventService.getById(eventId);
+        return ResponseEntity.ok(optionalEvent);
     }
 }

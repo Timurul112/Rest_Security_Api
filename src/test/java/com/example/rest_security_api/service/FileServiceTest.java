@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ class FileServiceTest {
 
         doReturn(listFileMetaData).when(s3Service).getListFiles(BUCKET_NAME);
 
-        List<String> actual = fileService.getAll(BUCKET_NAME);
+        List<FileDto> actual = fileService.getAll(BUCKET_NAME);
 
         assertThat(actual).isNotEmpty();
         assertThat(actual).hasSize(listFileMetaData.size());
@@ -89,7 +90,8 @@ class FileServiceTest {
     @Test
     void uploadFileInS3() {
         String fileName = "file_name";
-        String fileContent = "content";
+        byte[] contentByte = "content_test".getBytes();
+        MockMultipartFile multiFile = new MockMultipartFile(fileName, contentByte);
         String username = "username";
         User user = User.builder()
                 .username(username)
@@ -113,11 +115,11 @@ class FileServiceTest {
 
         doReturn(event).when(eventUserUtil).getEventForUpload(username, fileName, BUCKET_NAME);
 
-        fileService.uploadFileInS3(fileName, fileContent, username, BUCKET_NAME);
+        fileService.uploadFileInS3(fileName, multiFile, username, BUCKET_NAME);
 
 
         verify(eventService, times(1)).save(event);
-        verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, fileContent);
+        verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, multiFile);
     }
 
     @Test
@@ -272,7 +274,8 @@ class FileServiceTest {
 
         String fileName = "file_name";
         String username = "username";
-        String updateFileContent = "update_content";
+        byte[] contentByte = "update_content_test".getBytes();
+        MockMultipartFile multiFile = new MockMultipartFile(fileName, contentByte);
 
         User user = User.builder()
                 .username(username)
@@ -298,16 +301,17 @@ class FileServiceTest {
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForUpdateFile(file, username);
 
-        fileService.updateOwnFile(updateFileContent, username, fileName, BUCKET_NAME);
+        fileService.updateOwnFile(multiFile, username, fileName, BUCKET_NAME);
 
-        verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, updateFileContent);
+        verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, multiFile);
     }
 
     @Test
     void updateFileByName() {
         String fileName = "file_name";
         String username = "username";
-        String updateFileContent = "update_content";
+        byte[] contentByte = "update_content_test".getBytes();
+        MockMultipartFile multiFile = new MockMultipartFile(fileName, contentByte);
 
         User user = User.builder()
                 .username(username)
@@ -332,9 +336,9 @@ class FileServiceTest {
         doReturn(optionalFile).when(fileRepository).getByName(fileName);
         doReturn(event).when(eventUserUtil).getEventForUpdateFile(file, username);
 
-        fileService.updateFileByName(updateFileContent, username, fileName, BUCKET_NAME);
+        fileService.updateFileByName(multiFile, username, fileName, BUCKET_NAME);
 
         verify(eventService, times(1)).save(event);
-        verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, updateFileContent);
+        verify(s3Service, times(1)).uploadFile(BUCKET_NAME, fileName, multiFile);
     }
 }

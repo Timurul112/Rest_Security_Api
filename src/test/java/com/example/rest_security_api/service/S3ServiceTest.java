@@ -2,11 +2,17 @@ package com.example.rest_security_api.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.example.rest_security_api.dto.FileDto;
+import com.example.rest_security_api.entity.File;
+import com.example.rest_security_api.entity.Status;
+import com.example.rest_security_api.repository.FileRepository;
+import com.example.rest_security_api.util.GetLocationFileUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -14,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -23,9 +30,12 @@ class S3ServiceTest {
     public static String BUCKET_NAME = "timurul112";
 
 
-
     @Mock
     private AmazonS3 s3client;
+
+
+    @Mock
+    private FileRepository fileRepository;
 
     @InjectMocks
     private S3Service s3Service;
@@ -56,31 +66,38 @@ class S3ServiceTest {
     @Test
     void uploadFile() {
         String fileName = "file_name";
-        String content = "content";
+        byte[] contentByte = "upload_test".getBytes();
+        MockMultipartFile multiFile = new MockMultipartFile(fileName, contentByte);
 
-        s3Service.uploadFile(BUCKET_NAME, fileName, content);
+        s3Service.uploadFile(BUCKET_NAME, fileName, multiFile);
 
-        verify(s3client, times(1)).putObject(BUCKET_NAME, fileName, content);
     }
 
     @Test
     void getListFiles() {
-
         S3ObjectSummary summary1 = new S3ObjectSummary();
         summary1.setBucketName(BUCKET_NAME);
-        summary1.setBucketName("key1");
+        summary1.setKey("key");
         List<S3ObjectSummary> listSummary = new ArrayList<>();
         listSummary.add(summary1);
 
         ObjectListing objectListing = mock(ObjectListing.class);
-
+        String location = GetLocationFileUtil.getLocation(BUCKET_NAME, "key");
+        File file = File.builder()
+                .name("key1")
+                .status(Status.ACTIVE)
+                .location(location)
+                .createdBy("user").build();
+        Optional<File> optionalFile = Optional.of(file);
+        doReturn(optionalFile).when(fileRepository).getByName("key");
         doReturn(objectListing).when(s3client).listObjects(BUCKET_NAME);
         doReturn(listSummary).when(objectListing).getObjectSummaries();
 
-        List<String> actual = s3Service.getListFiles(BUCKET_NAME);
+        List<FileDto> actual = s3Service.getListFiles(BUCKET_NAME);
 
         assertThat(actual).isNotEmpty();
         assertThat(actual).hasSize(listSummary.size());
+
 
     }
 

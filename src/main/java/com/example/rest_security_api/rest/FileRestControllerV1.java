@@ -6,9 +6,11 @@ import com.example.rest_security_api.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,24 +34,26 @@ public class FileRestControllerV1 {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<String> getAll(@RequestParam String bucketName) {
-        return fileService.getAll(bucketName);
+    public ResponseEntity<List<FileDto>> getAll(@RequestParam String bucketName) {
+        List<FileDto> listFileDto = fileService.getAll(bucketName);
+        return ResponseEntity.ok(listFileDto);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
     @PostAuthorize("(hasAuthority('USER') and returnObject.get().createdBy == authentication.principal.username) or " +
             "hasAnyAuthority('MODERATOR', 'ADMIN')")
-    public Optional<FileDto> getById(@PathVariable(name = "id") Integer fileId) {
-        return fileService.getById(fileId);
+    public ResponseEntity<Optional<FileDto>> getById(@PathVariable(name = "id") Integer fileId) {
+        Optional<FileDto> optionalFileDto = fileService.getById(fileId);
+        return ResponseEntity.ok(optionalFileDto);
     }
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    public void upload(@RequestBody String fileContent, @RequestParam String fileName, @RequestParam String bucketName) {
+    public void upload(@RequestParam MultipartFile file, @RequestParam String fileName, @RequestParam String bucketName) {
         String username = AuthenticationUtil.getUsername();
-        fileService.uploadFileInS3(fileName, fileContent, username, bucketName);
+        fileService.uploadFileInS3(fileName, file, username, bucketName);
     }
 
 
@@ -90,13 +94,13 @@ public class FileRestControllerV1 {
 
     @PutMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR', 'USER')")
-    public void updateFile(@RequestBody String updateFileContent, @RequestParam String fileName, @RequestParam String bucketName) {
+    public void updateFile(@RequestBody MultipartFile file, @RequestParam String fileName, @RequestParam String bucketName) {
         String authority = AuthenticationUtil.getAuthority();
         String username = AuthenticationUtil.getUsername();
         if (authority.equals("USER")) {
-            fileService.updateOwnFile(updateFileContent, username, fileName, bucketName);
+            fileService.updateOwnFile(file, username, fileName, bucketName);
         } else if (authority.equals("ADMIN") || authority.equals("MODERATOR")) {
-            fileService.updateFileByName(updateFileContent, username, fileName, bucketName);
+            fileService.updateFileByName(file, username, fileName, bucketName);
         }
     }
 }

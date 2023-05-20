@@ -4,6 +4,7 @@ import com.example.rest_security_api.dto.EventDto;
 import com.example.rest_security_api.entity.*;
 import com.example.rest_security_api.mapper.EventReadMapper;
 import com.example.rest_security_api.repository.EventRepository;
+import com.example.rest_security_api.util.AuthenticationUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +25,6 @@ class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private EventReadMapper eventReadMapper;
-
 
     @InjectMocks
     private EventService eventService;
@@ -125,13 +125,19 @@ class EventServiceTest {
                 .file(file)
                 .build();
 
-        Optional<Event> optionalEvent = Optional.of(event);
 
-        doReturn(optionalEvent).when(eventRepository).findById(1);
+        EventDto eventDto = EventDto.builder()
+                .userId(event.getUser().getId())
+                .fileId(event.getFile().getId())
+                .build();
 
-        Optional<Event> actual = eventService.getById(1);
+
+        Optional<EventDto> optionalEventDto = Optional.of(eventDto);
+        doReturn(optionalEventDto).when(eventRepository).findById(1);
+
+        Optional<EventDto> actual = eventService.getById(1);
 
         assertThat(actual).isPresent();
-        assertThat(actual).isEqualTo(optionalEvent);
+        assertThat(actual).isEqualTo(optionalEventDto);
     }
 }

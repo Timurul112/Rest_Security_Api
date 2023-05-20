@@ -2,16 +2,18 @@ package com.example.rest_security_api.dto;
 
 
 import com.example.rest_security_api.entity.Status;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Builder
 public class FileDto {
-
-    String name;
-    String location;
-    Status status;
-    String createdBy;
-
+    private String name;
+    private String location;
+    private Status status;
+    private String createdBy;
 }

@@ -1,6 +1,5 @@
 package com.example.rest_security_api.config;
 
-import com.amazonaws.SDKGlobalConfiguration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
@@ -12,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class s3Config {
+public class s3Configuration {
 
     @Value("${localstack.port}")
     private int hostPort;

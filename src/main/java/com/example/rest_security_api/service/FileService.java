@@ -11,6 +11,7 @@ import com.example.rest_security_api.util.EventUserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -43,20 +44,20 @@ public class FileService {
         }
     }
 
-    public List<String> getAll(String bucketName) {
+    public List<FileDto> getAll(String bucketName) {
         return s3Service.getListFiles(bucketName);
     }
 
 
     @Transactional
-    public void uploadFileInS3(String fileName, String fileContent, String username, String bucketName) {
+    public void uploadFileInS3(String fileName, MultipartFile file, String username, String bucketName) {
         List<String> listNameBuckets = s3Service.getListBuckets().stream().map(Bucket::getName).toList();
         if (!listNameBuckets.contains(bucketName)) {
             s3Service.createBucket(bucketName);
         }
         Event event = eventUserUtil.getEventForUpload(username, fileName, bucketName);
         eventService.save(event);
-        s3Service.uploadFile(bucketName, fileName, fileContent);
+        s3Service.uploadFile(bucketName, fileName, file);
     }
 
 
@@ -102,21 +103,21 @@ public class FileService {
 
 
     @Transactional
-    public void updateOwnFile(String updateFileContent, String username, String fileName, String bucketName) {
-        File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
-        if (!file.getCreatedBy().equals(username)) {
+    public void updateOwnFile(MultipartFile file, String username, String fileName, String bucketName) {
+        File fileDB = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        if (!fileDB.getCreatedBy().equals(username)) {
             throw new RuntimeException("No access to file");
         }
-        Event event = eventUserUtil.getEventForUpdateFile(file, username);
+        Event event = eventUserUtil.getEventForUpdateFile(fileDB, username);
         eventService.save(event);
-        s3Service.uploadFile(bucketName, fileName, updateFileContent);
+        s3Service.uploadFile(bucketName, fileName, file);
     }
 
     @Transactional
-    public void updateFileByName(String updateFileContent, String username, String fileName, String bucketName) {
-        File file = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
-        Event event = eventUserUtil.getEventForUpdateFile(file, username);
+    public void updateFileByName(MultipartFile file, String username, String fileName, String bucketName) {
+        File fileDB = fileRepository.getByName(fileName).orElseThrow(() -> new RuntimeException("File does not exist"));
+        Event event = eventUserUtil.getEventForUpdateFile(fileDB, username);
         eventService.save(event);
-        s3Service.uploadFile(bucketName, fileName, updateFileContent);
+        s3Service.uploadFile(bucketName, fileName, file);
     }
 }
